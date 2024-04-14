@@ -24,7 +24,7 @@ These instructions will get you a copy of the project up and running on your loc
 Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/numeron.git
+git clone https://github.com/reyalka/numeron.git
 cd numeron
 ```
 Build the project:

@@ -76,7 +76,10 @@ impl Numeron {
     }
 
     pub fn run(&self) -> Result<(), Box<dyn Error>> {
-        println!("generated number in {} digit.", self.length.to_string().green().bold());
+        println!(
+            "generated number in {} digit.",
+            self.length.to_string().green().bold()
+        );
         let mut count = 0;
         loop {
             let answer = self.read_answer()?;
@@ -92,4 +95,74 @@ impl Numeron {
         }
         Ok(())
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+fn test_new_no_duplicate() {
+    let numeron = Numeron::new(3);
+    let correct_answer = &numeron.collect_answer;
+    let hash_set = correct_answer.iter().collect::<std::collections::HashSet<_>>();
+    assert_eq!(correct_answer.len(), hash_set.len());
+}
+
+    #[test]
+    fn test_check_all_blow() {
+        let answer = vec![2, 0, 1];
+        let result = Numeron::check(
+            &Numeron {
+                collect_answer: vec![1, 2, 0],
+                length: 3,
+            },
+            &answer,
+        );
+        assert_eq!(result.hit, 0);
+        assert_eq!(result.blow, 3);
+    }
+
+    #[test]
+    fn test_check_all_hit() {
+        let answer = vec![0, 1, 2];
+        let result = Numeron::check(
+            &Numeron {
+                collect_answer: vec![0, 1, 2],
+                length: 3,
+            },
+            &answer,
+        );
+        assert_eq!(result.hit, 3);
+        assert_eq!(result.blow, 0);
+    }
+
+    #[test]
+    fn test_check_hit_and_blow() {
+        let answer = vec![0, 2, 1];
+        let result = Numeron::check(
+            &Numeron {
+                collect_answer: vec![0, 1, 2],
+                length: 3,
+            },
+            &answer,
+        );
+        assert_eq!(result.hit, 1);
+        assert_eq!(result.blow, 2);
+    }
+
+    #[test]
+    fn test_check_with_long_length() {
+        let answer = vec![0, 2, 8, 3, 4, 6];
+        let result = Numeron::check(
+            &Numeron {
+                collect_answer:  vec![0, 1, 2, 3, 4, 8],
+                length: 6,
+            },
+            &answer,
+        );
+        assert_eq!(result.hit, 3);
+        assert_eq!(result.blow, 2);
+    }
+
 }
