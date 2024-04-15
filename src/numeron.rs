@@ -1,15 +1,15 @@
-use std::{error::Error, fmt::Display};
+use std::{collections::HashSet, error::Error, fmt::Display};
 
 use colored::Colorize;
 use inquire::{length, validator::Validation, InquireError, Text};
 use rand::Rng;
 
-type Answer = Vec<usize>;
+type Answer = Vec<u8>;
 
 #[derive(Debug)]
 pub struct HBResult {
-    pub hit: usize,
-    pub blow: usize,
+    pub hit: u8,
+    pub blow: u8,
 }
 impl Display for HBResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -24,14 +24,14 @@ impl Display for HBResult {
 
 pub struct Numeron {
     pub collect_answer: Answer,
-    pub length: usize,
+    pub length: u8,
 }
 
 impl Numeron {
-    pub fn new(length: usize) -> Numeron {
+    pub fn new(length: u8) -> Numeron {
         let mut rng = rand::thread_rng();
         let mut collect_answer = Vec::new();
-        let mut range = (0..=9).collect::<Vec<usize>>();
+        let mut range = (0..=9).collect::<Vec<u8>>();
         for _ in 1..=length {
             let index = rng.gen_range(0..range.len());
             collect_answer.push(range[index]);
@@ -51,15 +51,24 @@ impl Numeron {
                 Ok(Validation::Invalid("Please enter a number".into()))
             }
         };
+        let duplicate_validator = |s: &str| {
+            let hashset = s.chars().collect::<HashSet<_>>();
+            if s.len() == hashset.len() {
+                Ok(Validation::Valid)
+            } else {
+                Ok(Validation::Invalid("Please enter a number without duplication".into()))
+            }
+        };
 
         let answer: String = Text::new("Guess the number:")
-            .with_validator(length!(self.length))
+            .with_validator(length!(self.length.into()))
             .with_validator(digit_validator)
+            .with_validator(duplicate_validator)
             .prompt()?;
         Ok(answer
             .chars()
-            .map(|c| c.to_digit(10).unwrap() as usize)
-            .collect::<Vec<usize>>())
+            .map(|c| c.to_digit(10).unwrap() as u8)
+            .collect::<Vec<u8>>())
     }
 
     pub fn check(&self, answer: &Answer) -> HBResult {
