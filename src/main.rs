@@ -1,12 +1,12 @@
 mod numeron;
 mod cli;
 
-use std::error::Error;
+use std::io;
 use clap::Parser;
 use numeron::Numeron;
 use cli::Cli;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> io::Result<()> {
     let cli = Cli::parse();
     let numeron = Numeron::new(cli.length);
     numeron.run()?;
